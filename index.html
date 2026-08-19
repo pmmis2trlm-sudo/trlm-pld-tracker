@@ -1075,7 +1075,7 @@ function renderDailyProgressChart() {
   const wrap = $('#dailyProgressWrap');
   const log = STATE.dailyLog;
 
-  if (!CONFIG.DAILY_LOG_GID || log.length < 2) {
+  if (!CONFIG.DAILY_LOG_GID || log.length < 1) {
     wrap.innerHTML = `<div class="log-missing">
       <b>Daily tracking isn't connected yet.</b> Add a <code>Daily_Log</code> tab to the sheet
       (Date · Active PLDs · Identified New · Pending Identification · Approved · Pending Approval)
