@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="560" viewBox="0 0 560 560">
+  <g fill="none" stroke="#0f4a8c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+
+    <!-- motif 1: handloom weaving -->
+    <g transform="translate(40,50)">
+      <rect x="0" y="40" width="90" height="10" rx="3"/>
+      <line x1="8" y1="50" x2="8" y2="95"/>
+      <line x1="82" y1="50" x2="82" y2="95"/>
+      <line x1="20" y1="0" x2="20" y2="50"/>
+      <line x1="34" y1="0" x2="34" y2="50"/>
+      <line x1="48" y1="0" x2="48" y2="50"/>
+      <line x1="62" y1="0" x2="62" y2="50"/>
+      <path d="M14 20 h56" stroke-dasharray="3 6"/>
+      <path d="M14 32 h56" stroke-dasharray="3 6"/>
+      <circle cx="45" cy="112" r="16"/>
+      <path d="M33 128 q12 14 24 0"/>
+    </g>
+
+    <!-- motif 2: poultry / livestock rearing -->
+    <g transform="translate(300,30)">
+      <circle cx="30" cy="30" r="14"/>
+      <path d="M30 44 q-16 10 -16 28 q0 14 16 14 q16 0 16 -14 q0 -18 -16 -28z"/>
+      <path d="M14 26 q-10 -6 -14 2 q6 6 16 4z"/>
+      <circle cx="25" cy="26" r="1.6" fill="#0f4a8c"/>
+      <path d="M60 70 q6 -8 14 0" />
+      <path d="M76 88 q-14 12 -28 0" />
+    </g>
+
+    <!-- motif 3: basket / handicraft weaving -->
+    <g transform="translate(120,220)">
+      <path d="M0 30 q30 -22 60 0 l-8 40 q-22 12 -44 0z"/>
+      <path d="M4 33 q26 16 52 0" stroke-dasharray="2 7"/>
+      <path d="M8 45 q22 14 44 0" stroke-dasharray="2 7"/>
+      <path d="M22 30 q8 -20 16 0" />
+    </g>
+
+    <!-- motif 4: three women in a circle (SHG meeting, echoes logo) -->
+    <g transform="translate(370,240) scale(0.62)">
+      <circle cx="0" cy="-38" r="12"/>
+      <path d="M-16 10 q16 -34 32 0 q2 26 -32 26 q-34 0 -32 -26z" transform="translate(0,-8)"/>
+      <circle cx="-46" cy="-6" r="10"/>
+      <path d="M-60 34 q14 -26 28 0 q1 20 -28 20 q-27 0 -28 -20z" transform="translate(0,-4)"/>
+      <circle cx="46" cy="-6" r="10"/>
+      <path d="M32 34 q14 -26 28 0 q1 20 -28 20 q-27 0 -28 -20z" transform="translate(0,-4)"/>
+    </g>
+
+    <!-- motif 5: tailoring / sewing machine -->
+    <g transform="translate(30,360)">
+      <path d="M0 40 h70 q10 0 10 -10 v-4 h-20 l-8 -18 h-30z"/>
+      <circle cx="66" cy="26" r="4"/>
+      <line x1="66" y1="30" x2="66" y2="40"/>
+      <path d="M-6 52 h96" />
+    </g>
+
+    <!-- motif 6: sapling / kitchen-garden livelihood -->
+    <g transform="translate(420,400)">
+      <path d="M0 60 v-20"/>
+      <path d="M0 40 q-18 -4 -18 -22 q18 0 18 14z"/>
+      <path d="M0 34 q18 -4 18 -22 q-18 0 -18 14z"/>
+      <path d="M-22 60 h44 l-5 14 h-34z"/>
+    </g>
+
+  </g>
+</svg>
