@@ -715,7 +715,7 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
 
 <footer class="site-footer">
   <div class="container footer-inner">
-    <div>© Tripura Rural Livelihood Mission · Data reflects the linked Google Sheet in real time.<br><b>Every edit made in the sheet appears here automatically</b> — no redeploy needed.</div>
+    <div>© Debashish Datta, PM MIS LH,Tripura Rural Livelihood Mission · Data reflects the on daily basis improvement.<br><b>Data will fetched from LokOS daily basis</b> — No manual entry is required</div>
   </div>
 </footer>
 
@@ -1016,7 +1016,7 @@ function renderKpis() {
     { label: 'Active PLDs now (as of 19.08.26)', value: s.active, tone: 'leaf',
       sub: `<span class="up">${pct(s.active, s.totalTarget).toFixed(1)}%</span> of total target achieved`, bar: pct(s.active, s.totalTarget) },
     { label: 'Identified new PLDs — BPM level', value: s.identifiedNew, tone: 'gold',
-      sub: s.identifiedNew ? 'Awaiting DPM approval' : 'Not yet entered by BPMs this cycle', bar: pct(s.identifiedNew, s.freshTarget) },
+      sub: s.identifiedNew ? 'Marked newly from BPM level' : 'Not yet entered by BPMs this cycle', bar: pct(s.identifiedNew, s.freshTarget) },
     { label: 'Pending identification — Block level', value: s.pendingIdent, tone: 'sun',
       sub: `<span class="down">Gap to close</span> before 10 Sep 2026`, bar: 100 - pct(s.pendingIdent, s.totalTarget) },
     { label: 'Approved — DPM level', value: s.approved, tone: 'leaf',
