@@ -638,7 +638,7 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
           </svg>
           <div class="dial-figure">
             <div class="dial-pct" id="dialPct">–</div>
-            <div class="dial-pct-label">of total FY 2028&ndash;29 LD target already approved</div>
+            <div class="dial-pct-label">of the fresh PLD identification target already identified</div>
           </div>
         </div>
         <p class="dial-caption" id="dialCaption">Loading…</p>
@@ -715,7 +715,7 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
 
 <footer class="site-footer">
   <div class="container footer-inner">
-    <div>© Debashish Datta, PM MIS LH,Tripura Rural Livelihood Mission · Data reflects the on daily basis improvement.<br><b>Data will fetched from LokOS daily basis</b> — No manual entry is required</div>
+    <div>© Tripura Rural Livelihood Mission · Data reflects the linked Google Sheet in real time.<br><b>Every edit made in the sheet appears here automatically</b> — no redeploy needed.</div>
   </div>
 </footer>
 
@@ -1004,7 +1004,7 @@ function renderKpis() {
   const rows = selectedRows();
   const s = sumRows(rows);
 
-  setDial(pct(s.approved, s.totalTarget), s.approved, s.totalTarget);
+  setDial(pct(s.identifiedNew, s.freshTarget), s.identifiedNew, s.freshTarget);
 
   const cards = [
     { label: 'Total LD target · FY 2028-29', value: s.totalTarget, tone: 'ink',
@@ -1016,7 +1016,7 @@ function renderKpis() {
     { label: 'Active PLDs now (as of 19.08.26)', value: s.active, tone: 'leaf',
       sub: `<span class="up">${pct(s.active, s.totalTarget).toFixed(1)}%</span> of total target achieved`, bar: pct(s.active, s.totalTarget) },
     { label: 'Identified new PLDs — BPM level', value: s.identifiedNew, tone: 'gold',
-      sub: s.identifiedNew ? 'Marked newly from BPM level' : 'Not yet entered by BPMs this cycle', bar: pct(s.identifiedNew, s.freshTarget) },
+      sub: s.identifiedNew ? 'Awaiting DPM approval' : 'Not yet entered by BPMs this cycle', bar: pct(s.identifiedNew, s.freshTarget) },
     { label: 'Pending identification — Block level', value: s.pendingIdent, tone: 'sun',
       sub: `<span class="down">Gap to close</span> before 10 Sep 2026`, bar: 100 - pct(s.pendingIdent, s.totalTarget) },
     { label: 'Approved — DPM level', value: s.approved, tone: 'leaf',
@@ -1035,14 +1035,14 @@ function renderKpis() {
   `).join('');
 }
 
-function setDial(percentage, approved, target) {
+function setDial(percentage, identifiedNew, target) {
   const p = Math.max(0, Math.min(100, percentage));
   const circumference = 2 * Math.PI * 88;
   const offset = circumference * (1 - p / 100);
   $('#dialArc').setAttribute('stroke-dasharray', `${circumference} ${circumference}`);
   $('#dialArc').setAttribute('stroke-dashoffset', offset);
   $('#dialPct').textContent = `${p.toFixed(1)}%`;
-  $('#dialCaption').innerHTML = `<b>${fmt(approved)}</b> approved (DPM level) of <b>${fmt(target)}</b> total LD target`;
+  $('#dialCaption').innerHTML = `<b>${fmt(identifiedNew)}</b> identified (BPM level) of <b>${fmt(target)}</b> fresh PLD target`;
 }
 
 /* ==========================================================================
