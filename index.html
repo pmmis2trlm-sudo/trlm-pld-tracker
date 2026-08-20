@@ -368,6 +368,10 @@ section{margin-bottom:34px;}
   overflow:hidden;
 }
 .dial-card .eyebrow{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold-700); margin-bottom:2px;}
+.dial-heading{
+  font-family:var(--font-display); font-weight:600; font-size:14.5px; line-height:1.35;
+  color:var(--blue-900); margin:2px 0 6px; max-width:280px;
+}
 .dial-wrap{position:relative; width:230px; height:230px; margin:6px 0 8px;}
 .dial-figure{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;}
 .dial-pct{font-family:var(--font-display); font-size:44px; font-weight:700; color:var(--blue-900); line-height:1;}
@@ -396,6 +400,10 @@ section{margin-bottom:34px;}
 .kpi-label{font-size:11.5px; color:var(--ink-faint); font-weight:600; letter-spacing:.01em;}
 .kpi-value{font-family:var(--font-mono); font-size:25px; font-weight:600; color:var(--ink); letter-spacing:-.01em;}
 .kpi-sub{font-size:11.5px; color:var(--ink-soft);}
+.kpi-bullets{list-style:none; margin:2px 0 0; padding:0; display:flex; flex-direction:column; gap:1px;}
+.kpi-bullets li{position:relative; padding-left:11px; font-size:11.5px; color:var(--ink-soft);}
+.kpi-bullets li::before{content:"·"; position:absolute; left:0; color:var(--gold-700); font-weight:700;}
+.kpi-bullets b{color:var(--ink); font-family:var(--font-mono); font-weight:600;}
 .kpi-sub .up{color:var(--leaf-700); font-weight:700;}
 .kpi-sub .down{color:var(--sun-600); font-weight:700;}
 .kpi-bar{height:5px; border-radius:99px; background:var(--line-soft); overflow:hidden; margin-top:2px;}
@@ -475,6 +483,46 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
 .cell-good{color:var(--leaf-700);}
 .table-footnote{padding:12px 18px; font-size:11.5px; color:var(--ink-faint); border-top:1px solid var(--line-soft);}
 
+.clickable-name{
+  cursor:pointer; text-decoration:underline; text-decoration-style:dotted;
+  text-underline-offset:3px; text-decoration-color:var(--blue-100);
+  transition:color .12s ease;
+}
+.clickable-name:hover{color:var(--blue-700); text-decoration-color:var(--blue-700);}
+
+/* -------------------------------------------------------------------------
+   Detail modal — district/block/retention drilldown
+   ------------------------------------------------------------------------- */
+.detail-modal-overlay{
+  position:fixed; inset:0; z-index:100;
+  background:rgba(11,56,104,.45);
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+.detail-modal-overlay.is-open{display:flex;}
+.detail-modal{
+  background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-pop);
+  width:100%; max-width:420px; max-height:80vh; overflow:auto;
+  padding:0;
+}
+.detail-modal-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px; border-bottom:1px solid var(--line-soft);
+  position:sticky; top:0; background:#fff;
+}
+.detail-modal-head h3{margin:0; font-family:var(--font-display); font-size:16px; font-weight:600; color:var(--blue-900);}
+.detail-modal-head button{
+  background:var(--blue-50); border:none; color:var(--blue-800);
+  width:26px; height:26px; border-radius:50%; font-size:16px; line-height:1; cursor:pointer;
+}
+.detail-modal-head button:hover{background:var(--blue-100);}
+.detail-modal-body{list-style:none; margin:0; padding:16px 20px 20px;}
+.detail-modal-body li{
+  display:flex; justify-content:space-between; gap:12px;
+  font-size:13px; color:var(--ink-soft); padding:7px 0; border-bottom:1px dashed var(--line-soft);
+}
+.detail-modal-body li:last-child{border-bottom:none; font-weight:700; color:var(--ink);}
+.detail-modal-body b{font-family:var(--font-mono); color:var(--ink); font-weight:600;}
+
 /* -------------------------------------------------------------------------
    Footer
    ------------------------------------------------------------------------- */
@@ -547,7 +595,6 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
   <div class="container">
     <span class="status-dot is-loading" id="statusDot"></span>
     <span class="status-text"><b id="statusText">Connecting to the Google Sheet…</b></span>
-    <button class="config-link" onclick="alert('Sheet source: docs.google.com/spreadsheets/d/' + CONFIG.SHEET_ID + '\n\nTo point this dashboard at your own sheet or tab, open this index.html file in a text editor and edit the CONFIG block near the top of the &lt;script&gt; section.')">Data source &amp; config</button>
   </div>
 </div>
 
@@ -576,6 +623,7 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
     <div class="hero-grid">
       <div class="card dial-card">
         <span class="eyebrow">State-wide progress</span>
+        <h2 class="dial-heading">Potential Lakhpati Didis identified against total State Lakhpati Didi Target upto FY 2028-29</h2>
         <div class="dial-wrap">
           <svg viewBox="0 0 200 200" width="100%" height="100%">
             <circle cx="100" cy="100" r="88" fill="none" stroke="#eee8d8" stroke-width="14"/>
@@ -590,7 +638,7 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
           </svg>
           <div class="dial-figure">
             <div class="dial-pct" id="dialPct">–</div>
-            <div class="dial-pct-label">of total FY 2028&ndash;29 LD target already active</div>
+            <div class="dial-pct-label">of total FY 2028&ndash;29 LD target already approved</div>
           </div>
         </div>
         <p class="dial-caption" id="dialCaption">Loading…</p>
@@ -618,11 +666,11 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
   <section aria-label="Analysis charts">
     <div class="chart-grid">
       <div class="card chart-card">
-        <h3>District-wise identification progress</h3>
+        <h3 id="districtBarChartTitle">District-wise identification progress</h3>
         <div class="chart-scroll"><div class="chart-wrap"><canvas id="districtBarChart"></canvas></div></div>
       </div>
       <div class="card chart-card">
-        <h3>Retention by cohort year</h3>
+        <h3 id="retentionChartTitle">Retention by cohort year</h3>
         <div class="chart-scroll"><div class="chart-wrap"><canvas id="retentionChart"></canvas></div></div>
       </div>
     </div>
@@ -654,13 +702,20 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
 
 </main>
 
+<!-- DETAIL MODAL -->
+<div class="detail-modal-overlay" id="detailModal">
+  <div class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="detail-modal-head">
+      <h3 id="modalTitle">Detail</h3>
+      <button id="modalClose" type="button" aria-label="Close">&times;</button>
+    </div>
+    <ul class="detail-modal-body" id="modalBody"></ul>
+  </div>
+</div>
+
 <footer class="site-footer">
   <div class="container footer-inner">
     <div>© Tripura Rural Livelihood Mission · Data reflects the linked Google Sheet in real time.<br><b>Every edit made in the sheet appears here automatically</b> — no redeploy needed.</div>
-    <div class="footer-links">
-      <a href="https://trlm.tripura.gov.in/" target="_blank" rel="noopener">TRLM official site</a>
-      <a href="README.md" target="_blank" rel="noopener">Setup guide</a>
-    </div>
   </div>
 </footer>
 
@@ -681,8 +736,8 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
    ========================================================================== */
 const CONFIG = {
   SHEET_ID: '1jUiOjFXAQmcKG0dn3R_AhyNDm7yVSJ7XX4B_rRVD4PI',
-  TRACKER_GID: '0',           // <-- change to your tracker tab's gid
-  DAILY_LOG_GID: '',          // <-- fill in once the Daily_Log tab exists (see README)
+  TRACKER_GID: '1772918844',           // <-- change to your tracker tab's gid
+  DAILY_LOG_GID: '272847199',          // <-- fill in once the Daily_Log tab exists (see README)
   TARGET_DATE: '2026-09-10T18:00:00+05:30',   // identification-drive deadline
   REFRESH_MINUTES: 5,
   DRIVE_START_DATE: '2026-08-19',             // used only if Daily_Log has no earlier rows
@@ -949,13 +1004,13 @@ function renderKpis() {
   const rows = selectedRows();
   const s = sumRows(rows);
 
-  setDial(pct(s.active, s.totalTarget), s.active, s.totalTarget);
+  setDial(pct(s.approved, s.totalTarget), s.approved, s.totalTarget);
 
   const cards = [
     { label: 'Total LD target · FY 2028-29', value: s.totalTarget, tone: 'ink',
       sub: `${fmt(s.retTotal)} retained + ${fmt(s.freshTarget)} fresh` },
     { label: 'To be retained (existing LDs)', value: s.retTotal, tone: 'blue',
-      sub: `FY23-24 ${fmt(s.retC)} · FY24-25 ${fmt(s.retD)} · FY25-26 ${fmt(s.retE)}`, bar: pct(s.retTotal, s.totalTarget) },
+      sub: `<ul class="kpi-bullets"><li>FY23-24: <b>${fmt(s.retC)}</b></li><li>FY24-25: <b>${fmt(s.retD)}</b></li><li>FY25-26: <b>${fmt(s.retE)}</b></li></ul>`, bar: pct(s.retTotal, s.totalTarget) },
     { label: 'Fresh PLD identification target', value: s.freshTarget, tone: 'gold',
       sub: `${pct(s.freshTarget, s.totalTarget).toFixed(0)}% of the FY28-29 target`, bar: pct(s.freshTarget, s.totalTarget) },
     { label: 'Active PLDs now (as of 19.08.26)', value: s.active, tone: 'leaf',
@@ -966,8 +1021,8 @@ function renderKpis() {
       sub: `<span class="down">Gap to close</span> before 10 Sep 2026`, bar: 100 - pct(s.pendingIdent, s.totalTarget) },
     { label: 'Approved — DPM level', value: s.approved, tone: 'leaf',
       sub: `${pct(s.approved, s.active).toFixed(0)}% of active PLDs approved`, bar: pct(s.approved, s.active) },
-    { label: 'Not surveyed in last FY', value: s.notSurveyed, tone: s.notSurveyed > 0 ? 'ink' : 'leaf',
-      sub: s.notSurveyed > 0 ? 'Includes PLDs inactive after survey' : 'No backlog in this selection' },
+    { label: 'Pending approval — District level', value: s.pendingApproval, tone: 'ink',
+      sub: s.pendingApproval ? 'Awaiting district-level sign-off' : 'Nothing awaiting district sign-off' },
   ];
 
   $('#kpiGrid').innerHTML = cards.map((c) => `
@@ -980,14 +1035,14 @@ function renderKpis() {
   `).join('');
 }
 
-function setDial(percentage, active, target) {
+function setDial(percentage, approved, target) {
   const p = Math.max(0, Math.min(100, percentage));
   const circumference = 2 * Math.PI * 88;
   const offset = circumference * (1 - p / 100);
   $('#dialArc').setAttribute('stroke-dasharray', `${circumference} ${circumference}`);
   $('#dialArc').setAttribute('stroke-dashoffset', offset);
   $('#dialPct').textContent = `${p.toFixed(1)}%`;
-  $('#dialCaption').innerHTML = `<b>${fmt(active)}</b> active of <b>${fmt(target)}</b> total LD target`;
+  $('#dialCaption').innerHTML = `<b>${fmt(approved)}</b> approved (DPM level) of <b>${fmt(target)}</b> total LD target`;
 }
 
 /* ==========================================================================
@@ -995,15 +1050,29 @@ function setDial(percentage, active, target) {
    ========================================================================== */
 const CHART_FONT = { family: 'Inter, sans-serif', size: 11 };
 
+// When the current selection sits inside a single district, charts switch
+// from district-level bars to block-level bars for that district — more
+// useful once someone has filtered down that far.
+function chartGroupKey(rows) {
+  const districts = new Set(rows.map((r) => r.districtKey));
+  return districts.size === 1 ? 'block' : 'district';
+}
+
 function renderDistrictBarChart() {
   const rows = selectedRows();
+  const groupBy = chartGroupKey(rows);
   const map = new Map();
   rows.forEach((r) => {
-    if (!map.has(r.district)) map.set(r.district, sumRows([]));
-    const agg = map.get(r.district);
+    const label = groupBy === 'block' ? r.block : r.district;
+    if (!map.has(label)) map.set(label, sumRows([]));
+    const agg = map.get(label);
     NUMERIC_FIELDS.forEach((f) => (agg[f] += r[f]));
   });
   const entries = Array.from(map.entries()).sort((a, b) => b[1].pendingIdent - a[1].pendingIdent);
+
+  $('#districtBarChartTitle').textContent = groupBy === 'block'
+    ? `Block-wise identification progress · ${rows[0].district}`
+    : 'District-wise identification progress';
 
   const ctx = $('#districtBarChart').getContext('2d');
   const data = {
@@ -1033,13 +1102,19 @@ function renderDistrictBarChart() {
 
 function renderRetentionChart() {
   const rows = selectedRows();
+  const groupBy = chartGroupKey(rows);
   const map = new Map();
   rows.forEach((r) => {
-    if (!map.has(r.district)) map.set(r.district, { retC: 0, retD: 0, retE: 0 });
-    const a = map.get(r.district);
+    const label = groupBy === 'block' ? r.block : r.district;
+    if (!map.has(label)) map.set(label, { retC: 0, retD: 0, retE: 0 });
+    const a = map.get(label);
     a.retC += r.retC; a.retD += r.retD; a.retE += r.retE;
   });
   const entries = Array.from(map.entries()).sort((a, b) => (b[1].retC + b[1].retD + b[1].retE) - (a[1].retC + a[1].retD + a[1].retE));
+
+  $('#retentionChartTitle').textContent = groupBy === 'block'
+    ? `Retention by cohort year · ${rows[0].district} blocks`
+    : 'Retention by cohort year';
 
   const ctx = $('#retentionChart').getContext('2d');
   const data = {
@@ -1075,12 +1150,13 @@ function renderDailyProgressChart() {
   const wrap = $('#dailyProgressWrap');
   const log = STATE.dailyLog;
 
-  if (!CONFIG.DAILY_LOG_GID || log.length < 2) {
+  if (!CONFIG.DAILY_LOG_GID || log.length < 1) {
     wrap.innerHTML = `<div class="log-missing">
       <b>Daily tracking isn't connected yet.</b> Add a <code>Daily_Log</code> tab to the sheet
       (Date · Active PLDs · Identified New · Pending Identification · Approved · Pending Approval)
-      and either log one row a day, or install the auto-snapshot Apps Script (see README.md). Then paste
-      that tab's <code>gid</code> into <code>DAILY_LOG_GID</code> near the top of this file's &lt;script&gt; section.
+      and either log one row a day, or install the auto-snapshot Apps Script in
+      <code>google-apps-script/daily_snapshot.gs</code>. Then paste that tab's <code>gid</code> into
+      <code>DAILY_LOG_GID</code> in <code>js/app.js</code>. See README.md for the full walkthrough.
     </div>`;
     $('#paceRow').innerHTML = '';
     return;
@@ -1110,11 +1186,21 @@ function renderDailyProgressChart() {
 
   // pace + projection
   const first = log[0], last = log[log.length - 1];
-  const spanDays = Math.max(1, daysBetween(first.date, last.date));
-  const dailyPace = (last.active - first.active) / spanDays;
   const now = new Date();
   const daysLeft = daysBetween(now, target);
   const stateTarget = sumRows(STATE.rows).totalTarget;
+
+  if (log.length < 2) {
+    $('#paceRow').innerHTML = `
+      <div class="pace-box"><div class="pl">Active PLDs today</div><div class="pv">${fmt(last.active)}</div></div>
+      <div class="pace-box"><div class="pl">Days to deadline</div><div class="pv">${daysLeft >= 0 ? daysLeft : 0}</div></div>
+      <div class="pace-box" style="flex:1 1 240px;"><div class="pl">Pace &amp; projection</div><div class="pv" style="font-size:12.5px; font-weight:500; color:var(--ink-soft);">Appears once a 2nd day is logged</div></div>
+    `;
+    return;
+  }
+
+  const spanDays = Math.max(1, daysBetween(first.date, last.date));
+  const dailyPace = (last.active - first.active) / spanDays;
   const remaining = Math.max(0, stateTarget - last.active);
   const daysToFinish = dailyPace > 0 ? Math.ceil(remaining / dailyPace) : Infinity;
   const projected = Number.isFinite(daysToFinish) ? new Date(now.getTime() + daysToFinish * 86400000) : null;
@@ -1134,9 +1220,6 @@ function renderDailyProgressChart() {
 const TABLE_COLS = [
   { key: 'district', label: 'District' },
   { key: 'block', label: 'Block' },
-  { key: 'retC', label: "Ret. FY23-24" },
-  { key: 'retD', label: "Ret. FY24-25" },
-  { key: 'retE', label: "Ret. FY25-26" },
   { key: 'retTotal', label: 'Total retain' },
   { key: 'freshTarget', label: 'Fresh target' },
   { key: 'totalTarget', label: 'Total target' },
@@ -1145,7 +1228,6 @@ const TABLE_COLS = [
   { key: 'pendingIdent', label: 'Pending ident.' },
   { key: 'approved', label: 'Approved' },
   { key: 'pendingApproval', label: 'Pending appr.' },
-  { key: 'notSurveyed', label: 'Not surveyed' },
 ];
 
 function renderTableHead() {
@@ -1173,13 +1255,13 @@ function renderTable() {
   const rows = buildTableRows();
   const body = rows.map((r) => `
     <tr>
-      <td>${r.district}</td><td>${r.block}</td>
-      <td>${fmt(r.retC)}</td><td>${fmt(r.retD)}</td><td>${fmt(r.retE)}</td><td>${fmt(r.retTotal)}</td>
+      <td><span class="clickable-name" data-type="district" data-key="${r.districtKey}">${r.district}</span></td>
+      <td><span class="clickable-name" data-type="block" data-key="${r.key}">${r.block}</span></td>
+      <td><span class="clickable-name" data-type="retain" data-key="${r.key}">${fmt(r.retTotal)}</span></td>
       <td>${fmt(r.freshTarget)}</td><td>${fmt(r.totalTarget)}</td>
       <td>${fmt(r.active)}</td><td>${fmt(r.identifiedNew)}</td>
       <td class="${r.pendingIdent > 0 ? 'cell-flag' : 'cell-good'}">${fmt(r.pendingIdent)}</td>
       <td>${fmt(r.approved)}</td><td>${fmt(r.pendingApproval)}</td>
-      <td class="${r.notSurveyed < 0 ? 'cell-flag' : ''}">${fmt(r.notSurveyed)}</td>
     </tr>
   `).join('');
 
@@ -1187,10 +1269,10 @@ function renderTable() {
   const totalRow = `
     <tr class="row-target">
       <td>Selection total</td><td>${rows.length} block${rows.length === 1 ? '' : 's'}</td>
-      <td>${fmt(totals.retC)}</td><td>${fmt(totals.retD)}</td><td>${fmt(totals.retE)}</td><td>${fmt(totals.retTotal)}</td>
+      <td>${fmt(totals.retTotal)}</td>
       <td>${fmt(totals.freshTarget)}</td><td>${fmt(totals.totalTarget)}</td>
       <td>${fmt(totals.active)}</td><td>${fmt(totals.identifiedNew)}</td><td>${fmt(totals.pendingIdent)}</td>
-      <td>${fmt(totals.approved)}</td><td>${fmt(totals.pendingApproval)}</td><td>${fmt(totals.notSurveyed)}</td>
+      <td>${fmt(totals.approved)}</td><td>${fmt(totals.pendingApproval)}</td>
     </tr>`;
 
   $('#tableBody').innerHTML = body + totalRow;
@@ -1206,6 +1288,84 @@ function exportCsv() {
   a.href = URL.createObjectURL(blob);
   a.download = `PLD-tracker-export-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
+}
+
+/* ==========================================================================
+   7b. DETAIL MODAL — click a district/block name, or a Total-retain value
+   ========================================================================== */
+function openModal(title, bulletsHtml) {
+  $('#modalTitle').textContent = title;
+  $('#modalBody').innerHTML = bulletsHtml;
+  $('#detailModal').classList.add('is-open');
+}
+function closeModal() {
+  $('#detailModal').classList.remove('is-open');
+}
+
+function districtBullets(districtKey) {
+  const d = STATE.byDistrict.get(districtKey);
+  if (!d) return '<li>No data.</li>';
+  const p = pct(d.approved, d.totalTarget);
+  return `
+    <li>Blocks in this district: <b>${d.blocks.length}</b></li>
+    <li>Total LD target · FY 2028-29: <b>${fmt(d.totalTarget)}</b></li>
+    <li>To be retained (existing LDs): <b>${fmt(d.retTotal)}</b></li>
+    <li>Fresh PLD identification target: <b>${fmt(d.freshTarget)}</b></li>
+    <li>Active PLDs now: <b>${fmt(d.active)}</b></li>
+    <li>Identified new PLDs — BPM level: <b>${fmt(d.identifiedNew)}</b></li>
+    <li>Pending identification — Block level: <b>${fmt(d.pendingIdent)}</b></li>
+    <li>Approved — DPM level: <b>${fmt(d.approved)}</b></li>
+    <li>Pending approval — District level: <b>${fmt(d.pendingApproval)}</b></li>
+    <li>Approved vs total target: <b>${p.toFixed(1)}%</b></li>
+  `;
+}
+
+function blockBullets(rowKey) {
+  const r = STATE.rows.find((x) => x.key === rowKey);
+  if (!r) return '<li>No data.</li>';
+  const p = pct(r.approved, r.totalTarget);
+  return `
+    <li>District: <b>${r.district}</b></li>
+    <li>Total LD target · FY 2028-29: <b>${fmt(r.totalTarget)}</b></li>
+    <li>To be retained (existing LDs): <b>${fmt(r.retTotal)}</b></li>
+    <li>Fresh PLD identification target: <b>${fmt(r.freshTarget)}</b></li>
+    <li>Active PLDs now: <b>${fmt(r.active)}</b></li>
+    <li>Identified new PLDs — BPM level: <b>${fmt(r.identifiedNew)}</b></li>
+    <li>Pending identification — Block level: <b>${fmt(r.pendingIdent)}</b></li>
+    <li>Approved — DPM level: <b>${fmt(r.approved)}</b></li>
+    <li>Pending approval — District level: <b>${fmt(r.pendingApproval)}</b></li>
+    <li>Approved vs total target: <b>${p.toFixed(1)}%</b></li>
+  `;
+}
+
+function retainBullets(rowKey) {
+  const r = STATE.rows.find((x) => x.key === rowKey);
+  if (!r) return '<li>No data.</li>';
+  return `
+    <li>FY 2023-24: <b>${fmt(r.retC)}</b></li>
+    <li>FY 2024-25: <b>${fmt(r.retD)}</b></li>
+    <li>FY 2025-26: <b>${fmt(r.retE)}</b></li>
+    <li>Total to be retained: <b>${fmt(r.retTotal)}</b></li>
+  `;
+}
+
+function initModal() {
+  $('#tableBody').addEventListener('click', (e) => {
+    const el = e.target.closest('.clickable-name');
+    if (!el) return;
+    const type = el.dataset.type, key = el.dataset.key;
+    if (type === 'district') openModal(STATE.byDistrict.get(key)?.district || key, districtBullets(key));
+    else if (type === 'block') {
+      const r = STATE.rows.find((x) => x.key === key);
+      openModal(r ? `${r.block} · ${r.district}` : key, blockBullets(key));
+    } else if (type === 'retain') {
+      const r = STATE.rows.find((x) => x.key === key);
+      openModal(r ? `Retention breakdown · ${r.block}` : 'Retention breakdown', retainBullets(key));
+    }
+  });
+  $('#modalClose').addEventListener('click', closeModal);
+  $('#detailModal').addEventListener('click', (e) => { if (e.target.id === 'detailModal') closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 }
 
 /* ==========================================================================
@@ -1275,6 +1435,7 @@ function initUi() {
 
 (async function boot() {
   initUi();
+  initModal();
   await loadAll();
   buildFilterPanel();
   setInterval(loadAll, CONFIG.REFRESH_MINUTES * 60000);
