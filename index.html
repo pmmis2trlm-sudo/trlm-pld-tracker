@@ -1044,7 +1044,7 @@ function renderKpis() {
     { label: 'Active PLDs now (as of 19.08.26)', value: s.active, tone: 'leaf',
       sub: `<span class="up">${pct(s.active, s.totalTarget).toFixed(1)}%</span> of total target achieved`, bar: pct(s.active, s.totalTarget) },
     { label: 'Identified new PLDs — BPM level', value: s.identifiedNew, tone: 'gold',
-      sub: s.identifiedNew ? 'Awaiting DPM approval' : 'Not yet entered by BPMs this cycle', bar: pct(s.identifiedNew, s.freshTarget) },
+      sub: s.identifiedNew ? 'Newly Identified PLDs from FY 2026-27 Onwards' : 'Not yet entered by BPMs this cycle', bar: pct(s.identifiedNew, s.freshTarget) },
     { label: 'Pending identification — Block level', value: s.pendingIdent, tone: 'sun',
       sub: `<span class="down">Gap to close</span> before 10 Sep 2026`, bar: 100 - pct(s.pendingIdent, s.totalTarget) },
     { label: 'Approved — DPM level', value: s.approved, tone: 'leaf',
