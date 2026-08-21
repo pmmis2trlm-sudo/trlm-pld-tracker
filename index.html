@@ -654,7 +654,7 @@ table.data-table tbody tr.row-target td{border-top:1px solid var(--gold-500); bo
     <div class="progress-solo">
       <div class="card progress-card">
         <div class="section-head" style="margin-bottom:0;">
-          <div><span class="eyebrow">Daily progress</span><h2 style="font-size:17px;">New PLD identification pace toward 10 Sep 2026</h2></div>
+          <div><span class="eyebrow">Daily progress</span><h2 style="font-size:17px;">Day-wise new PLD identification, vs. previous day — toward 10 Sep 2026</h2></div>
           <p class="section-note" id="dailyProgressScope">Whole Tripura</p>
         </div>
         <div id="dailyProgressWrap"></div>
@@ -820,6 +820,12 @@ function extractTrackerRows(grid) {
   return out;
 }
 
+// Daily_Log supports two row shapes so older district-only history keeps working
+// once block-level logging is switched on:
+//   NEW (block-level):  Date | District | Block | Active | IdentifiedNew | PendingIdent | Approved | PendingApproval
+//   OLD (district-only): Date | District | Active | IdentifiedNew | PendingIdent | Approved | PendingApproval
+// We tell them apart by checking whether column C parses as a number (old schema)
+// or as a block name (new schema).
 function extractDailyLog(grid) {
   const rows = [];
   for (const r of grid) {
@@ -827,13 +833,31 @@ function extractDailyLog(grid) {
     const d = new Date(r[0]);
     if (Number.isNaN(d.getTime())) continue; // header row
     const district = (r[1] || '').toString().trim();
-    if (!district) continue; // malformed / old-schema row
+    if (!district) continue; // malformed row
     const num = (i) => { const v = parseFloat(r[i]); return Number.isFinite(v) ? v : 0; };
+
+    const col2Raw = (r[2] || '').toString().trim();
+    const isBlockLevel = col2Raw !== '' && Number.isNaN(parseFloat(col2Raw));
+
+    let block = null, active, identifiedNew, pending, approved, pendingApproval;
+    if (isBlockLevel) {
+      block = col2Raw;
+      active = num(3); identifiedNew = num(4); pending = num(5);
+      approved = num(6); pendingApproval = num(7);
+    } else {
+      active = num(2); identifiedNew = num(3); pending = num(4);
+      approved = num(5); pendingApproval = num(6);
+    }
+
     rows.push({
       date: d,
       districtKey: normKey(district),
-      active: num(2), identifiedNew: num(3), pending: num(4),
-      approved: num(5), pendingApproval: num(6),
+      blockKey: block ? block.toUpperCase() : null,
+      // Matches the block-row `key` format used in STATE.rows / selectedRows() so
+      // day-wise filtering can drill down to the exact same district/block scope
+      // the person has selected in the sidebar. Null for old district-only rows.
+      key: block ? `${normKey(district)}||${block.toUpperCase()}` : null,
+      active, identifiedNew, pending, approved, pendingApproval,
     });
   }
   rows.sort((a, b) => a.date - b.date);
@@ -1152,11 +1176,19 @@ function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
 
 // Roll district-level daily rows up to one total-per-date for whichever
 // districts are implied by the current District/Block filter selection.
+// Rolls Daily_Log rows up to one cumulative total per date, honouring the
+// exact district/block scope currently checked in the sidebar. Block-level
+// log rows are matched by their district||block key; any older district-only
+// log rows (from before block-level logging existed) fall back to matching
+// on district alone so historical data isn't lost.
 function selectionDailySeries() {
-  const selDistricts = new Set(selectedRows().map((r) => r.districtKey));
+  const sel = selectedRows();
+  const selBlockKeys = new Set(sel.map((r) => r.key));
+  const selDistrictKeys = new Set(sel.map((r) => r.districtKey));
   const byDate = new Map(); // 'yyyy-mm-dd' -> {date, identifiedNew, active}
   STATE.dailyLog.forEach((r) => {
-    if (!selDistricts.has(r.districtKey)) return;
+    const inScope = r.key ? selBlockKeys.has(r.key) : selDistrictKeys.has(r.districtKey);
+    if (!inScope) return;
     const key = r.date.toISOString().slice(0, 10);
     if (!byDate.has(key)) byDate.set(key, { date: r.date, identifiedNew: 0, active: 0 });
     const agg = byDate.get(key);
@@ -1178,8 +1210,8 @@ function renderDailyProgressChart() {
   if (!CONFIG.DAILY_LOG_GID || !STATE.dailyLog.length) {
     wrap.innerHTML = `<div class="log-missing">
       <b>Daily tracking isn't connected yet.</b> Add a <code>Daily_Log</code> tab to the sheet
-      (Date · District · Active PLDs · Identified New · Pending Identification · Approved · Pending Approval)
-      and either log one row a day per district, or install the auto-snapshot Apps Script in
+      (Date · District · Block · Active PLDs · Identified New · Pending Identification · Approved · Pending Approval)
+      and either log one row a day per block, or install the auto-snapshot Apps Script in
       <code>google-apps-script/daily_snapshot.gs</code>. Then paste that tab's <code>gid</code> into
       <code>DAILY_LOG_GID</code> in <code>js/app.js</code>. See README.md for the full walkthrough.
     </div>`;
@@ -1187,45 +1219,23 @@ function renderDailyProgressChart() {
     return;
   }
 
-  const series = selectionDailySeries();
+  const series = selectionDailySeries(); // cumulative "Identified New" snapshot per logged date
   if (!series.length) {
     wrap.innerHTML = `<div class="log-missing">No daily figures logged yet for this selection.</div>`;
     $('#paceRow').innerHTML = '';
     return;
   }
 
-  wrap.innerHTML = `<div class="progress-chart-wrap"><canvas id="dailyProgressChart"></canvas></div>`;
   const target = new Date(CONFIG.TARGET_DATE);
-  const labels = series.map((r) => r.date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }));
-  const identifiedSeries = series.map((r) => r.identifiedNew);
-
-  const ctx = $('#dailyProgressChart').getContext('2d');
-  if (STATE.charts.daily) STATE.charts.daily.destroy();
-  STATE.charts.daily = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Identified new PLDs', data: identifiedSeries, borderColor: '#e8ac33', backgroundColor: 'rgba(232,172,51,.16)', fill: true, tension: .3, pointRadius: 2 },
-      ],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: {
-        y: { beginAtZero: true, ticks: { font: CHART_FONT, callback: (v) => (v >= 1000 ? v / 1000 + 'k' : v) } },
-        x: { ticks: { font: CHART_FONT, maxRotation: 0, autoSkip: true } },
-      },
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `Identified new PLDs: ${fmt(c.raw)}` } } },
-    },
-  });
-
-  // pace + projection, scoped to the current selection's fresh-PLD target
-  const first = series[0], last = series[series.length - 1];
   const now = new Date();
   const daysLeft = daysBetween(now, target);
   const selectionFreshTarget = sumRows(selectedRows()).freshTarget;
+  const last = series[series.length - 1];
 
+  // Only one day logged yet — nothing to compare "today vs yesterday" against.
   if (series.length < 2) {
+    wrap.innerHTML = `<div class="log-missing">Only one day logged so far for this selection —
+      day-wise progress appears once a second day is recorded.</div>`;
     $('#paceRow').innerHTML = `
       <div class="pace-box"><div class="pl">Identified so far</div><div class="pv">${fmt(last.identifiedNew)}</div></div>
       <div class="pace-box"><div class="pl">Days to deadline</div><div class="pv">${daysLeft >= 0 ? daysLeft : 0}</div></div>
@@ -1234,16 +1244,60 @@ function renderDailyProgressChart() {
     return;
   }
 
-  const spanDays = Math.max(1, daysBetween(first.date, last.date));
-  const dailyPace = (last.identifiedNew - first.identifiedNew) / spanDays;
+  // Day-wise progress = how much the cumulative "Identified New" total moved
+  // since the previous logged date, for each day after the first. The very
+  // first logged date has no prior snapshot to compare against, so it isn't
+  // plotted as a bar (there's no "yesterday" for it).
+  const dayRows = [];
+  for (let i = 1; i < series.length; i++) {
+    dayRows.push({
+      date: series[i].date,
+      delta: series[i].identifiedNew - series[i - 1].identifiedNew,
+    });
+  }
+
+  wrap.innerHTML = `<div class="progress-chart-wrap"><canvas id="dailyProgressChart"></canvas></div>`;
+  const labels = dayRows.map((r) => r.date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }));
+  const deltas = dayRows.map((r) => r.delta);
+
+  const ctx = $('#dailyProgressChart').getContext('2d');
+  if (STATE.charts.daily) STATE.charts.daily.destroy();
+  STATE.charts.daily = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'New PLDs identified that day', data: deltas, backgroundColor: deltas.map((v) => v < 0 ? '#d9534f' : '#e8ac33'), borderRadius: 3, maxBarThickness: 36 },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, ticks: { font: CHART_FONT, callback: (v) => (Math.abs(v) >= 1000 ? v / 1000 + 'k' : v) } },
+        x: { ticks: { font: CHART_FONT, maxRotation: 0, autoSkip: true } },
+      },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `New PLDs that day: ${fmt(c.raw)} (vs. previous log)` } } },
+    },
+  });
+
+  // Pace = average day-wise progress across all logged days (not just the
+  // first/last snapshot), so a single unusually short or long gap between
+  // two entries can't distort the figure the way it did before.
+  const spanDays = daysBetween(series[0].date, last.date);
+  const totalDelta = last.identifiedNew - series[0].identifiedNew;
+  const dailyPace = spanDays > 0 ? totalDelta / spanDays : null;
   const remaining = Math.max(0, selectionFreshTarget - last.identifiedNew);
-  const daysToFinish = dailyPace > 0 ? Math.ceil(remaining / dailyPace) : Infinity;
+  const daysToFinish = dailyPace && dailyPace > 0 ? Math.ceil(remaining / dailyPace) : Infinity;
   const projected = Number.isFinite(daysToFinish) ? new Date(now.getTime() + daysToFinish * 86400000) : null;
   const onTrack = projected ? projected <= target : false;
   const notStarted = last.identifiedNew === 0;
 
+  const paceLabel = dailyPace === null
+    ? '<span style="font-size:12.5px; font-weight:500; color:var(--ink-soft);">Insufficient span between logs</span>'
+    : `${dailyPace >= 0 ? '+' : ''}${fmt(dailyPace)}/day`;
+
   $('#paceRow').innerHTML = `
-    <div class="pace-box"><div class="pl">Daily pace</div><div class="pv">${dailyPace >= 0 ? '+' : ''}${fmt(dailyPace)}/day</div></div>
+    <div class="pace-box"><div class="pl">Daily pace (avg.)</div><div class="pv">${paceLabel}</div></div>
     <div class="pace-box"><div class="pl">Days to deadline</div><div class="pv">${daysLeft >= 0 ? daysLeft : 0}</div></div>
     <div class="pace-box"><div class="pl">Projected completion</div><div class="pv ${onTrack ? 'tone-leaf' : 'tone-sun'}">${projected ? projected.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div></div>
     <div class="pace-box"><div class="pl">Status</div><div class="pv ${notStarted ? '' : (onTrack ? 'tone-leaf' : 'tone-sun')}">${notStarted ? 'Not yet started' : (onTrack ? 'On track' : 'Behind schedule')}</div></div>
